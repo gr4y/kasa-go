@@ -2,6 +2,7 @@ package kasa
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -57,6 +58,22 @@ func (s smartPlug) GetInfo() (DeviceInfo, error) {
 		log.Fatal(err)
 	}
 	return deviceInfo, nil
+}
+
+func (s smartPlug) GetEnergyInfo() (EnergyInfo, error) {
+	var energyInfo EnergyInfo
+	res, err := s.getAuthRequest(requestBody{
+		Method: methodPassthrough,
+		Params: params{
+			DeviceID:    s.DeviceID,
+			RequestData: "{\"emeter\":{\"get_realtime\":{}}}",
+		},
+	}).execute()
+	if err != nil {
+		return energyInfo, err
+	}
+	fmt.Println(fmt.Sprintf("%v+", res.ResponseData))
+	return energyInfo, nil
 }
 
 func (s smartPlug) TurnOn() error {
